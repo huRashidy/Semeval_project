@@ -7,69 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, auc, confusion_matrix, ConfusionMatrixDisplay
 from .focal_loss import FocalLoss
 # Function to plot ROC curve
-def plot_roc_curve(true_labels, pred_probs, class_names):
-    """
-    Plot ROC curves for each class in a multilabel classification task.
-    
-    Args:
-        true_labels (np.array): True labels (one-hot encoded).
-        pred_probs (np.array): Predicted probabilities for each class.
-        class_names (list): List of class names.
-    """
-    n_classes = len(class_names)
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
-
-    # Compute ROC curve and ROC area for each class
-    for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(true_labels[:, i], pred_probs[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
-
-    # Plot ROC curves
-    plt.figure(figsize=(10, 8))
-    for i in range(n_classes):
-        plt.plot(fpr[i], tpr[i], label=f"{class_names[i]} (AUC = {roc_auc[i]:.2f})")
-
-    plt.plot([0, 1], [0, 1], "k--", label="Random Guessing")
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title("ROC Curves for Multilabel Classification")
-    
-    plt.legend(loc="lower right")
-    plt.savefig(f"ROC curve for ROBERTA with freezing only with focal loss")
-
-    plt.show()
-
-# Function to plot confusion matrix
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
-import matplotlib.pyplot as plt
 import numpy as np
-
-def plot_confusion_matrix(true_labels, pred_labels, class_names):
-    """
-    Plot confusion matrices for multi-label classification (one per class).
-    
-    Args:
-        true_labels (np.array): True labels (binary matrix, shape [n_samples, n_classes]).
-        pred_labels (np.array): Predicted labels (binary matrix, shape [n_samples, n_classes]).
-        class_names (list): List of class names.
-    """
-    for i, class_name in enumerate(class_names):
-        # Extract true and predicted labels for the current class
-        true_class = true_labels[:, i]
-        pred_class = pred_labels[:, i]
-
-        # Compute confusion matrix
-        cm = confusion_matrix(true_class, pred_class)
-
-        # Plot confusion matrix
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[f"Not {class_name}", class_name])
-        disp.plot(cmap=plt.cm.Blues)
-        plt.title(f"Confusion Matrix for {class_name}")
-        plt.savefig(f"Confusion_Matrix_{class_name}.png")  # Save the plot
-        plt.show()
-        
 def eval_plots(model, tokenizer, val_loader):
     true_labels = []
     pred_probs = []
@@ -104,11 +42,6 @@ def eval_plots(model, tokenizer, val_loader):
 
     # Define class names
     class_names = ["Anger", "Fear", "Joy", "Sadness", "Surprise"]
-    # Plot ROC curves
-    plot_roc_curve(true_labels, pred_probs, class_names)
-
-    # Plot confusion matrices
-    plot_confusion_matrix(true_labels, pred_labels, class_names)
 
 # File path
 file_path = "/data/horse/ws/huel099f-huel099f-Semeval/data/public_data/train/track_a/eng.csv"  # Replace with the correct path

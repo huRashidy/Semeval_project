@@ -30,40 +30,6 @@ def print_f1_scores(true_labels, pred_labels, class_names):
         print(f"F1-score for {class_name}: {f1_scores[i]:.4f}")
 
 # Function to plot ROC curve
-def plot_roc_curve(true_labels, pred_probs, class_names):
-    n_classes = len(class_names)
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
-
-    for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(true_labels[:, i], pred_probs[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
-
-    plt.figure(figsize=(10, 8))
-    for i in range(n_classes):
-        plt.plot(fpr[i], tpr[i], label=f"{class_names[i]} (AUC = {roc_auc[i]:.2f})")
-
-    plt.plot([0, 1], [0, 1], "k--", label="Random Guessing")
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title("ROC Curves for Multilabel Classification")
-    plt.legend(loc="lower right")
-    plt.savefig(f"ROC curve for ROBERTA with freezing only with threshold 0.9 pseudo labelings")
-    plt.show()
-
-# Function to plot confusion matrix
-def plot_confusion_matrix(true_labels, pred_labels, class_names):
-    for i, class_name in enumerate(class_names):
-        true_class = true_labels[:, i]
-        pred_class = pred_labels[:, i]
-        cm = confusion_matrix(true_class, pred_class)
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[f"Not {class_name}", class_name])
-        disp.plot(cmap=plt.cm.Blues)
-        plt.title(f"Confusion Matrix for {class_name}")
-        plt.savefig(f"Confusion_Matrix_{class_name}.png")
-        plt.show()
-        
 def eval_plots(model, tokenizer, val_loader):
     true_labels = []
     pred_probs = []
@@ -96,8 +62,6 @@ def eval_plots(model, tokenizer, val_loader):
 
     class_names = ["Anger", "Fear", "Joy", "Sadness", "Surprise"]
     print_f1_scores(true_labels, pred_labels, class_names)
-    plot_roc_curve(true_labels, pred_probs, class_names)
-    plot_confusion_matrix(true_labels, pred_labels, class_names)
 
 # File path
 file_path = "/data/horse/ws/huel099f-huel099f-Semeval/data/public_data/train/track_a/eng.csv"
@@ -190,7 +154,7 @@ print(f"First 5 entries in unlabeled_texts: {unlabeled_texts[:5]}")
 print(f"Type of first entry: {type(unlabeled_texts[0])}")
 print(f"Any None values in unlabeled_texts: {any(text is None for text in unlabeled_texts)}")
 print(f"Any NaN values in unlabeled_texts: {any(pd.isna(text) for text in unlabeled_texts)}")
-"""
+
 # Create a dataset for unlabeled data
 unlabeled_dataset = EmotionDataset(unlabeled_texts, np.zeros((len(unlabeled_texts), 5)))  # Dummy labels
 unlabeled_loader = DataLoader(unlabeled_dataset, batch_size=16)
@@ -279,7 +243,7 @@ for epoch in range(epochs):
 print(f"Retraining completed. Best Validation F1-Score: {best_f1:.4f}")
 print(f"Model saved to {save_path}")
 
-"""
+
 model = RobertaForSequenceClassification.from_pretrained(save_path, num_labels=5).to(device)
 # Evaluate the final model
 eval_plots(model, tokenizer, val_loader)

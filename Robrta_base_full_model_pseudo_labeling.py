@@ -9,39 +9,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Function to plot ROC curve
-def plot_roc_curve(true_labels, pred_probs, class_names):
-    n_classes = len(class_names)
-    fpr = dict()
-    tpr = dict()
-    roc_auc = dict()
-
-    for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve(true_labels[:, i], pred_probs[:, i])
-        roc_auc[i] = auc(fpr[i], tpr[i])
-
-    plt.figure(figsize=(10, 8))
-    for i in range(n_classes):
-        plt.plot(fpr[i], tpr[i], label=f"{class_names[i]} (AUC = {roc_auc[i]:.2f})")
-
-    plt.plot([0, 1], [0, 1], "k--", label="Random Guessing")
-    plt.xlabel("False Positive Rate")
-    plt.ylabel("True Positive Rate")
-    plt.title("ROC Curves for Multilabel Classification")
-    plt.legend(loc="lower right")
-    plt.savefig(f"ROC curve for ROBERTA with all parametr training with psdueo labelings")
-    plt.show()
-
-# Function to plot confusion matrix
-def plot_confusion_matrix(true_labels, pred_labels, class_names):
-    for i, class_name in enumerate(class_names):
-        true_class = true_labels[:, i]
-        pred_class = pred_labels[:, i]
-        cm = confusion_matrix(true_class, pred_class)
-        disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=[f"Not {class_name}", class_name])
-        disp.plot(cmap=plt.cm.Blues)
-        plt.title(f"Confusion Matrix for {class_name}")
-        plt.savefig(f"Confusion_Matrix_{class_name}.png")
-        plt.show()
         
 def eval_plots(model, tokenizer, val_loader):
     true_labels = []
@@ -74,8 +41,6 @@ def eval_plots(model, tokenizer, val_loader):
     print("pred_labels " , pred_labels[:5] )
 
     class_names = ["Anger", "Fear", "Joy", "Sadness", "Surprise"]
-    plot_roc_curve(true_labels, pred_probs, class_names)
-    plot_confusion_matrix(true_labels, pred_labels, class_names)
 
 # File path
 file_path = "/data/horse/ws/huel099f-huel099f-Semeval/data/public_data/train/track_a/eng.csv"
